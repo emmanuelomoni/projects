@@ -8,9 +8,7 @@ const mapIframe = document.getElementById('map');
 
 button.addEventListener(`click`,function(event){
     event.preventDefault();
-    const nameOfCity = cityName.value
-    const apiKey = `5820c8faff63c6b4504212821d389588`
-    const endPoint = `https://api.openweathermap.org/data/2.5/weather?q=${nameOfCity}&appid=${apiKey}`
+    const nameOfCity = cityName.value;
     const currentDate = new Date();
     const dayName = days[currentDate.getDay()];
     const monthName = months[currentDate.getMonth()];
@@ -18,7 +16,6 @@ button.addEventListener(`click`,function(event){
     const year = currentDate.getFullYear();
 
     const formattedDate = `${date} ${monthName}, ${year}`
-    
 
     // Testing with XHR- Old style, i know :)
     //     let request = new XMLHttpRequest()
@@ -127,16 +124,19 @@ button.addEventListener(`click`,function(event){
 
     // Using fetch method
 
-    fetch(endPoint).then((response)=>{
+    fetch(`http://localhost:4000/weather?city=${nameOfCity}`).then((response)=>{
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
         return response.json()
     }).then((weatherData)=>{
-        console.log(weatherData)
+        // console.log(weatherData)
         const latitude = weatherData.coord.lat;
         const longitude = weatherData.coord.lon;
 
         const mapIframeSrc = getMapUrl(latitude, longitude)
         
-
+        let dataHtml = ``
 
         dataHtml = `                
         <div class="left-output">
@@ -221,9 +221,10 @@ button.addEventListener(`click`,function(event){
             spinner.style.display = `none`
         }
 
-    }).catch((error)=>{
-        console.error(`Failed to fetch:`)
-    })
+    }).catch((error) => {
+        console.error('Failed to fetch:', error);
+        console.error('Error details:', error.message);
+    });
 })
 
 let mapCache = {};
